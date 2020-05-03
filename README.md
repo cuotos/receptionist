@@ -1,7 +1,7 @@
 # Receptionist
 
 Receptionist is a very simple Golang application that creates a single page of links to the containers you have running 
-on your server.
+on your server. It runs on port 8080 in the container, for you to expose anywhere you want.
 
 ### Why?
 
@@ -23,7 +23,6 @@ Will show a link to `http://localhost:4567` on the UI.
 
 ### Environment Variables (for Receptionist )
 
-* `PORT` - The port for receptionist ui to list on (default: `8080`).
 * `WATCHVAR` - The environment variable for Receptionist to look for on running containers (default `RECEPTIONIST`).
 
 ### Volumes

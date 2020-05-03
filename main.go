@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/client"
 	"github.com/kelseyhightower/envconfig"
@@ -18,7 +17,6 @@ var (
 
 type Config struct {
 	Prefix string `envconfig:"WATCHVAR" default:"RECEPTIONIST"`
-	Port   string `envconfig:"PORT" default:"8080"`
 }
 
 type Container struct {
@@ -39,7 +37,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	log.Printf("listening on %v", config.Port)
+	log.Printf("listening on :8080")
 	log.Printf(`using receptionist env var "%v"`, config.Prefix)
 
 	http.HandleFunc("/", func(writer http.ResponseWriter, request *http.Request) {
@@ -57,7 +55,7 @@ func main() {
 		}
 	})
 
-	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%v", config.Port), nil))
+	log.Fatal(http.ListenAndServe(":8080", nil))
 }
 
 func getRunningContainers() ([]Container, error) {
