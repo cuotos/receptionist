@@ -13,15 +13,15 @@ would list the running containers and which port that are listening on.
 
 `$ docker run -v /var/run/docker.sock:/var/run/docker.sock:ro -p 8080:8080 cuotos/receptionist`
 
-Receptionist will list any containers that contain the environment variable `RECEPTIONIST=<port>`
+Receptionist will list any containers that contain the label `RECEPTIONIST=<port>`
 
 i.e.
 
-`docker run --name webserver -e RECEPTIONIST=4567 -p 4567:80 nginx`
+`docker run --name webserver -l RECEPTIONIST=4567 -p 4567:80 nginx`
 
 Will show a link to `http://localhost:4567` on the UI.
 
-### Environment Variables
+### Environment Variables (for Receptionist )
 
 * `PORT` - The port for receptionist ui to list on (default: `8080`).
 * `WATCHVAR` - The environment variable for Receptionist to look for on running containers (default `RECEPTIONIST`).

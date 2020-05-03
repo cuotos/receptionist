@@ -9,7 +9,6 @@ import (
 	"log"
 	"net/http"
 	"receptionist/templates"
-	"strconv"
 	"strings"
 )
 
@@ -19,11 +18,11 @@ var (
 
 type Config struct {
 	Prefix string `envconfig:"WATCHVAR" default:"RECEPTIONIST"`
-	Port   int    `envconfig:"PORT" default:"8080"`
+	Port   string `envconfig:"PORT" default:"8080"`
 }
 
 type Container struct {
-	Port      int
+	Port      string
 	ModelName string
 	types.ContainerJSON
 }
@@ -81,12 +80,12 @@ func getRunningContainers() ([]Container, error) {
 			return nil, err
 		}
 
-		wanted, port, err := doWeWantThisContainer(cont)
+		port, err := doWeWantThisContainer(cont)
 		if err != nil {
 			return nil, err
 		}
 
-		if wanted {
+		if port != "" {
 			model = append(model, Container{port, strings.TrimPrefix(cont.Name, "/"), cont})
 		}
 	}
@@ -94,17 +93,12 @@ func getRunningContainers() ([]Container, error) {
 	return model, nil
 }
 
-func doWeWantThisContainer(c types.ContainerJSON) (bool, int, error) {
-	env := c.Config.Env
-	for _, e := range env {
-		if strings.HasPrefix(e, config.Prefix) {
-			port, err := strconv.Atoi(strings.TrimPrefix(e, config.Prefix+"="))
-			if err != nil {
-				return false, 0, fmt.Errorf("unable to parse port %s", e)
-			}
+func doWeWantThisContainer(c types.ContainerJSON) (string, error) {
+	labels := c.Config.Labels
 
-			return true, port, nil
-		}
+	if port, wanted := labels[config.Prefix]; wanted {
+		return port, nil
 	}
-	return false, 0, nil
+
+	return "", nil
 }
