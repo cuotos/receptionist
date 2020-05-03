@@ -21,13 +21,19 @@ var Tpl  = template.Must(template.New("tpl").Parse(`
         {{ range . }}
         <tr>
           <td>{{ .ModelName }}</td>
-		  <td><a href="http://localhost:{{ .Port }}" target="_blank">{{ .Port }}</a></td>
+		  <td><a class="rec-link" href="http://localhost:{{ .Port }}" target="_blank">{{ .Port }}</a></td>
           <td>{{ .Config.Image }}</td>
         </tr>
         {{ end }}
         </tbody>
       </table>
     </div>
+    <script type="text/javascript">
+        var links = Array.from(document.getElementsByClassName("rec-link"));
+		for ( let l of links ) {
+          l.hostname = location.hostname;
+        }
+    </script>
   </body>
 </html>
 `))
