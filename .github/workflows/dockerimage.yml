@@ -32,3 +32,12 @@ jobs:
         uses: actions-hub/docker@master
         with:
           args: push ${GITHUB_REPOSITORY}:${IMAGE_TAG}
+          
+      - name: Update Docker Hub readme
+        uses: meeDamian/sync-readme@v1.0.6
+        with:
+          user: ${{ secrets.DOCKER_USERNAME }}
+          pass: ${{ secrets.DOCKER_PASSWORD }}
+          slug: ${GITHUB_REPOSITORY}
+          readme: README.md
+          description: A landing page for your docker containers.
