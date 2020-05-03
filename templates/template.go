@@ -10,7 +10,7 @@ var Tpl  = template.Must(template.New("tpl").Parse(`
   </head>
   </body>
     <div class="container">
-      <h1>"please hold..."
+      <h2>"please hold..."</h2>
       <table class="table table-striped">
         <thead>
           <th>Name</th>
