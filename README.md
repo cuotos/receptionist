@@ -24,7 +24,7 @@ Will show a link to `http://localhost:4567` on the UI.
 ### Environment Variables
 
 * `PORT` - The port for receptionist ui to list on (default: `8080`).
-* `WATCHVAR` - The environment variable for Receptionist to look for on running containers.
+* `WATCHVAR` - The environment variable for Receptionist to look for on running containers (default `RECEPTIONIST`).
 
 ### Volumes
 
