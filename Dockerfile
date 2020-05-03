@@ -10,6 +10,8 @@ RUN go build -o receptionist main.go
 
 FROM alpine
 
+EXPOSE 8080
+
 COPY --from=builder /app/receptionist /receptionist
 
 CMD ["/receptionist"]
