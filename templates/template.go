@@ -22,7 +22,11 @@ var Tpl  = template.Must(template.New("tpl").Parse(`
         {{ range . }}
         <tr>
           <td>{{ .ModelName }}</td>
-		  <td><a class="rec-link" href="http://localhost:{{ .Port }}" target="_blank">{{ .Port }}</a></td>
+		  <td>
+			{{ range .Ports }}
+			<a class="rec-link" href="http://localhost:{{ .Port }}" target="_blank">{{ .Port }}</a>
+			{{ end }}
+		  </td>
           <td>{{ .Config.Image }}</td>
         </tr>
         {{ end }}
