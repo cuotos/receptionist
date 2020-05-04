@@ -26,7 +26,7 @@ The `RECEPTIONIST` label can contain 1 or more comma seperated ports.
 
 `docker run --name webserver -l RECEPTIONIST=4567,7654 -p 4567:80 container/image`
 
-If your container exposes multiple ports, an optional *name* can be assigned to the ports by prefixing it with `<name>:`
+If your container exposes multiple ports, an optional *name* can be assigned to the ports by prefixing it with `<name>:<port>`
 
 `docker run --name webserver -l RECEPTIONIST=ui:4567,api:9999 container/image`
 
