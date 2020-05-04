@@ -19,8 +19,13 @@ type Config struct {
 	Prefix string `envconfig:"WATCHVAR" default:"RECEPTIONIST"`
 }
 
+type Port struct {
+	Port string
+	Name string
+}
+
 type Container struct {
-	Port      string
+	Ports      []Port
 	ModelName string
 	types.ContainerJSON
 }
@@ -78,25 +83,44 @@ func getRunningContainers() ([]Container, error) {
 			return nil, err
 		}
 
-		port, err := doWeWantThisContainer(cont)
+		ports, err := doWeWantThisContainer(cont)
 		if err != nil {
 			return nil, err
 		}
 
-		if port != "" {
-			model = append(model, Container{port, strings.TrimPrefix(cont.Name, "/"), cont})
+		if ports != nil {
+			model = append(model, Container{ports, strings.TrimPrefix(cont.Name, "/"), cont})
 		}
 	}
 
 	return model, nil
 }
 
-func doWeWantThisContainer(c types.ContainerJSON) (string, error) {
+func doWeWantThisContainer(c types.ContainerJSON) ([]Port, error) {
 	labels := c.Config.Labels
 
-	if port, wanted := labels[config.Prefix]; wanted {
-		return port, nil
+	if ports, wanted := labels[config.Prefix]; wanted {
+		ps, err := extractPorts(ports)
+		if err != nil {
+			return nil, err
+		}
+		return ps, nil
 	}
 
-	return "", nil
+	return nil, nil
+}
+
+func extractPorts(portsString string) ([]Port, error) {
+
+	ports := []Port{}
+
+	portStrings := strings.Split(portsString, ",")
+	for _, s := range portStrings {
+		if strings.TrimSpace(s) != "" {
+			ports = append(ports, Port{s, ""})
+		}
+	}
+
+	return ports, nil
+
 }
