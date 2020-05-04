@@ -40,6 +40,30 @@ func TestExtractPorts(t *testing.T) {
 				{"9090", ""},
 			},
 		},
+		{
+			"single named port",
+			"UI:9090",
+			[]Port{
+				{"9090", "UI"},
+			},
+		},
+		{
+			"multiple named ports",
+			"UI:9090,API:10101",
+			[]Port{
+				{"9090", "UI"},
+				{ "10101", "API"},
+			},
+		},
+		{
+			"multiple named ports w/ missing name",
+			"UI:9090,API:10101,:11111",
+			[]Port{
+				{"9090", "UI"},
+				{ "10101", "API"},
+				{ "11111", ""},
+			},
+		},
 	}
 
 	for _, tc := range tcs {
