@@ -22,11 +22,11 @@ Receptionist will list any containers that contain the label key `RECEPTIONIST`
 #### Additional Containers
 The `RECEPTIONIST` label can contain 1 or more comma seperated ports.
 
-`docker run --name webserver -l RECEPTIONIST=4567,7654 -p 4567:80 nginx`
+`docker run --name webserver -l RECEPTIONIST=4567,7654 -p 4567:80 container/image`
 
 If your container exposes multiple ports, an optional *name* can be assigned to the ports by prefixing it with `<name>:`
 
-`docker run --name webserver -l RECEPTIONIST=ui:4567,api:9999`
+`docker run --name webserver -l RECEPTIONIST=ui:4567,api:9999 container/image`
 
 ### Environment Variables (for Receptionist )
 
