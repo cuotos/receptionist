@@ -117,7 +117,18 @@ func extractPorts(portsString string) ([]Port, error) {
 	portStrings := strings.Split(portsString, ",")
 	for _, s := range portStrings {
 		if strings.TrimSpace(s) != "" {
-			ports = append(ports, Port{s, ""})
+			var p, n string
+
+			if strings.Contains(s, ":") {
+				splitPort := strings.Split(s, ":")
+				p = splitPort[1]
+				n = splitPort[0]
+			} else {
+				p = s
+				n = ""
+			}
+
+			ports = append(ports, Port{p, n})
 		}
 	}
 

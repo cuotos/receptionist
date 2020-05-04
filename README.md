@@ -14,17 +14,19 @@ would list the running containers and which port that are listening on.
 
 ### Usage
 
+#### Receptionist
 `$ docker run -v /var/run/docker.sock:/var/run/docker.sock:ro -p 8080:8080 cuotos/receptionist`
 
 Receptionist will list any containers that contain the label key `RECEPTIONIST`
 
-The value can be one or more comma separated port numbers `RECEPTIONIST=9090,101010`
+#### Additional Containers
+The `RECEPTIONIST` label can contain 1 or more comma seperated ports.
 
-i.e.
+`docker run --name webserver -l RECEPTIONIST=4567,7654 -p 4567:80 nginx`
 
-`docker run --name webserver -l RECEPTIONIST=4567 -p 4567:80 nginx`
+If your container exposes multiple ports, an optional *name* can be assigned to the ports by prefixing it with `<name>:`
 
-Will show a link to `http://localhost:4567` on the UI.
+`docker run --name webserver -l RECEPTIONIST=ui:4567,api:9999`
 
 ### Environment Variables (for Receptionist )
 
