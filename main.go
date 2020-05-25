@@ -83,7 +83,7 @@ func getRunningContainers() ([]Container, error) {
 			return nil, err
 		}
 
-		ports, err := doWeWantThisContainer(cont)
+		ports, err := doWeWantThisContainer(cont, config.Prefix)
 		if err != nil {
 			return nil, err
 		}
@@ -96,11 +96,11 @@ func getRunningContainers() ([]Container, error) {
 	return model, nil
 }
 
-func doWeWantThisContainer(c types.ContainerJSON) ([]Port, error) {
+func doWeWantThisContainer(c types.ContainerJSON, label string) ([]Port, error) {
 	labels := c.Config.Labels
 
-	if ports, wanted := labels[config.Prefix]; wanted {
-		ps, err := extractPorts(ports)
+	if ports, wanted := labels[label]; wanted {
+		ps, _, err := parsePortsLabel(ports)
 		if err != nil {
 			return nil, err
 		}
@@ -110,28 +110,41 @@ func doWeWantThisContainer(c types.ContainerJSON) ([]Port, error) {
 	return nil, nil
 }
 
-func extractPorts(portsString string) ([]Port, error) {
+func parsePortsLabel(portsString string) (ports []Port, listAllPorts bool, err error) {
 
-	ports := []Port{}
-
+	// split the argument by comma into port "element"
 	portStrings := strings.Split(portsString, ",")
+
 	for _, s := range portStrings {
-		if strings.TrimSpace(s) != "" {
-			var p, n string
 
-			if strings.Contains(s, ":") {
-				splitPort := strings.Split(s, ":")
-				p = splitPort[1]
-				n = splitPort[0]
+		// clean the element up
+		s = strings.TrimSpace(s)
+
+		// if it is not empty
+		if s != "" {
+
+			var port, name string
+
+			// the element contains only ALL, so turn on the flag that the user wants to list all exposed ports
+			if s == "ALL" {
+				listAllPorts = true
+
 			} else {
-				p = s
-				n = ""
-			}
+				// If the element contains a colon, then get the port number and name from the element
+				if strings.Contains(s, ":") {
+					splitPort := strings.Split(s, ":")
+					port = splitPort[1]
+					name = splitPort[0]
+				} else {
+					port = s
+					name = ""
+				}
 
-			ports = append(ports, Port{p, n})
+				ports = append(ports, Port{port, name})
+			}
 		}
 	}
 
-	return ports, nil
+	return
 
 }

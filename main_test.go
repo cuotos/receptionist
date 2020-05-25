@@ -7,13 +7,15 @@ import (
 
 func TestExtractPorts(t *testing.T) {
 	tcs := []struct{
-		Title string
-		Input string
-		Expected []Port
+		Title     string
+		Input     string
+		ExpectAll bool
+		Expected  []Port
 	}{
 		{
 			"single port",
 			"9090,",
+			false,
 			[]Port{
 				{"9090",""},
 			},
@@ -21,6 +23,7 @@ func TestExtractPorts(t *testing.T) {
 		{
 			"two ports",
 			"9090,10101",
+			false,
 			[]Port{
 				{"9090", ""},
 				{"10101", ""},
@@ -29,6 +32,7 @@ func TestExtractPorts(t *testing.T) {
 		{
 			"single port w/ trailing comma",
 			"9090,",
+			false,
 			[]Port{
 				{"9090", ""},
 			},
@@ -36,6 +40,7 @@ func TestExtractPorts(t *testing.T) {
 		{
 			"single port w/ leading and trailing comma",
 			",9090,",
+			false,
 			[]Port{
 				{"9090", ""},
 			},
@@ -43,6 +48,7 @@ func TestExtractPorts(t *testing.T) {
 		{
 			"single named port",
 			"UI:9090",
+			false,
 			[]Port{
 				{"9090", "UI"},
 			},
@@ -50,6 +56,7 @@ func TestExtractPorts(t *testing.T) {
 		{
 			"multiple named ports",
 			"UI:9090,API:10101",
+			false,
 			[]Port{
 				{"9090", "UI"},
 				{ "10101", "API"},
@@ -58,19 +65,62 @@ func TestExtractPorts(t *testing.T) {
 		{
 			"multiple named ports w/ missing name",
 			"UI:9090,API:10101,:11111",
+			false,
 			[]Port{
 				{"9090", "UI"},
 				{ "10101", "API"},
 				{ "11111", ""},
 			},
 		},
+		{
+			"all ports should be exposed",
+			"ALL",
+			true,
+			nil,
+		},
+		{
+			"named port plus all port flag",
+			"API:1111,ALL",
+			true,
+			[]Port{
+				{"1111","API"},
+			},
+		},
+		{
+			"no name port and all port flag",
+			":1111,ALL",
+			true,
+			[]Port{
+				{"1111", ""},
+			},
+		},
 	}
 
 	for _, tc := range tcs {
 		t.Run(tc.Title, func(t *testing.T) {
-			actual, _ := extractPorts(tc.Input)
+			actual, all, _ := parsePortsLabel(tc.Input)
 			assert.DeepEqual(t, actual, tc.Expected)
+			assert.Equal(t, all, tc.ExpectAll)
 		})
-
 	}
 }
+
+//func TestAllPortsFlag(t *testing.T) {
+//	tcs := []struct{
+//		InputContainer types.ContainerJSON
+//		ExpectedPorts []string
+//	}{
+//		{
+//			types.ContainerJSON{
+//				Config: &container.Config{
+//					Labels: map[string]string{"RECEP": "test"},
+//				},
+//			},
+//			[]string{""},
+//		},
+//	}
+//
+//	for _, tc := range tcs {
+//		actual :=
+//	}
+//}
