@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/client"
 	"github.com/kelseyhightower/envconfig"
@@ -22,8 +23,8 @@ type Config struct {
 }
 
 type Port struct {
-	PublicPort  string
-	PrivatePort string
+	PublicPort  uint16
+	PrivatePort uint16
 	Name        string
 }
 
@@ -34,15 +35,15 @@ type Container struct {
 
 func init() {
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
-}
-
-func main() {
 
 	config = &Config{}
 	err := envconfig.Process("", config)
 	if err != nil {
 		log.Fatal(err)
 	}
+}
+
+func main() {
 
 	log.Printf("listening on :8080")
 	log.Printf(`using receptionist label "%v"`, config.Prefix)
@@ -97,18 +98,21 @@ func getAllPortsFromContainer(c types.Container) ([]*Port, error) {
 
 	allPorts := []*Port{}
 
-	if l, found := c.Labels[config.Prefix]; found {
+	if l, found := c.Labels["RECEPTIONIST"]; found {
 
 		for _, p := range c.Ports {
 
 			if p.PublicPort != 0 {
 
 				newPort := &Port{
-					PublicPort:  strconv.Itoa(int(p.PublicPort)),
-					PrivatePort: strconv.Itoa(int(p.PrivatePort)),
+					PublicPort:  p.PublicPort,
+					PrivatePort: p.PrivatePort,
 				}
 
-				newPort.Name = getPortName(newPort, l)
+				err := populatePortName(newPort, l)
+				if err != nil {
+					return nil, fmt.Errorf("unable to populate port name: %w", err)
+				}
 
 				allPorts = append(allPorts, newPort)
 			}
@@ -118,7 +122,7 @@ func getAllPortsFromContainer(c types.Container) ([]*Port, error) {
 	return allPorts, nil
 }
 
-func getPortName(p *Port, label string) string {
+func populatePortName(p *Port, label string) error {
 	labelElements := strings.Split(label, ",")
 
 	for _, e := range labelElements {
@@ -126,13 +130,18 @@ func getPortName(p *Port, label string) string {
 			name := strings.Split(e, ":")[0]
 			port := strings.Split(e, ":")[1]
 
-			if p.PrivatePort == port {
-				return name
+			portUint, err := strconv.ParseUint(port, 10, 16)
+			if err != nil {
+				return fmt.Errorf("unable to parse port number from string: %w", err)
+			}
+
+			if p.PrivatePort == uint16(portUint) {
+				p.Name = name
 			}
 		}
 	}
 
-	return ""
+	return nil
 }
 
 func sortPorts(ports []*Port){

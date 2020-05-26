@@ -15,7 +15,7 @@ var Tpl  = template.Must(template.New("tpl").Parse(`
       <table class="table table-striped">
         <thead>
           <th>Container Name</th>
-          <th>Port(s)</th>
+          <th>Ports ( Host - [ Name ] (Container) )</th>
           <th>Image</th>
         </thead>
         <tbody>
