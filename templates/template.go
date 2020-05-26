@@ -21,14 +21,10 @@ var Tpl  = template.Must(template.New("tpl").Parse(`
         <tbody>
         {{ range . }}
         <tr>
-          <td>{{ .ModelName }}</td>
+          <td>{{ .Name }}</td>
 		  <td>
 			{{ range .Ports }}
-              {{ if not .Name }}
-				<a class="rec-link" href="http://localhost:{{ .Port }}" target="_blank">{{ .Port }}</a></br>
-			  {{ else }}
-			  	<a class="rec-link" href="http://localhost:{{ .Port }}" target="_blank">{{ .Port }} ({{ .Name }})</a></br>
-              {{ end }}
+				<a class="rec-link" href="http://localhost:{{ .PublicPort }}" target="_blank">{{ .PublicPort }} - {{ .Name }}</a> ({{.PrivatePort}})</br>
 			{{ end }}
 		  </td>
           <td>{{ .Config.Image }}</td>

@@ -8,6 +8,8 @@ import (
 	"log"
 	"net/http"
 	"receptionist/templates"
+	"sort"
+	"strconv"
 	"strings"
 )
 
@@ -16,17 +18,18 @@ var (
 )
 
 type Config struct {
-	Prefix string `envconfig:"WATCHVAR" default:"RECEPTIONIST"`
+	Prefix string `envconfig:"WATCHLABEL" default:"RECEPTIONIST"`
 }
 
 type Port struct {
-	Port string
-	Name string
+	PublicPort  string
+	PrivatePort string
+	Name        string
 }
 
 type Container struct {
-	Ports      []Port
-	ModelName string
+	Ports []*Port
+	Name  string
 }
 
 func init() {
@@ -42,17 +45,17 @@ func main() {
 	}
 
 	log.Printf("listening on :8080")
-	log.Printf(`using receptionist env var "%v"`, config.Prefix)
+	log.Printf(`using receptionist label "%v"`, config.Prefix)
 
 	http.HandleFunc("/", func(writer http.ResponseWriter, request *http.Request) {
-		model, err := getRunningContainers()
+		containers, err := getRunningContainers()
 		if err != nil {
 			log.Println(err)
 			http.Error(writer, http.StatusText(500), 500)
 			return
 		}
 
-		err = templates.Tpl.Execute(writer, model)
+		err = templates.Tpl.Execute(writer, containers)
 
 		if err != nil {
 			return
@@ -77,69 +80,63 @@ func getRunningContainers() ([]Container, error) {
 	}
 
 	for _, c := range containers {
-		ports, err := doWeWantThisContainer(c, config.Prefix)
+		ports, err := getAllPortsFromContainer(c)
 		if err != nil {
 			return nil, err
 		}
 
 		if ports != nil {
+			sortPorts(ports)
 			model = append(model, Container{ports, strings.TrimPrefix(c.Names[0], "/")})
 		}
 	}
-
 	return model, nil
 }
 
-func doWeWantThisContainer(c types.Container, label string) ([]Port, error) {
-	labels := c.Labels
+func getAllPortsFromContainer(c types.Container) ([]*Port, error) {
 
-	if ports, wanted := labels[label]; wanted {
-		ps, _, err := parsePortsLabel(ports)
-		if err != nil {
-			return nil, err
-		}
+	allPorts := []*Port{}
 
-		return ps, nil
-	}
+	if l, found := c.Labels[config.Prefix]; found {
 
-	return nil, nil
-}
+		for _, p := range c.Ports {
 
-func parsePortsLabel(portsString string) (ports []Port, listAllPorts bool, err error) {
+			if p.PublicPort != 0 {
 
-	// split the argument by comma into port "element"
-	portStrings := strings.Split(portsString, ",")
-
-	for _, s := range portStrings {
-
-		// clean the element up
-		s = strings.TrimSpace(s)
-
-		// if it is not empty
-		if s != "" {
-
-			var port, name string
-
-			// the element contains only ALL, so turn on the flag that the user wants to list all exposed ports
-			if s == "ALL" {
-				listAllPorts = true
-
-			} else {
-				// If the element contains a colon, then get the port number and name from the element
-				if strings.Contains(s, ":") {
-					splitPort := strings.Split(s, ":")
-					port = splitPort[1]
-					name = splitPort[0]
-				} else {
-					port = s
-					name = ""
+				newPort := &Port{
+					PublicPort:  strconv.Itoa(int(p.PublicPort)),
+					PrivatePort: strconv.Itoa(int(p.PrivatePort)),
 				}
 
-				ports = append(ports, Port{port, name})
+				newPort.Name = getPortName(newPort, l)
+
+				allPorts = append(allPorts, newPort)
 			}
 		}
 	}
 
-	return
+	return allPorts, nil
+}
 
+func getPortName(p *Port, label string) string {
+	labelElements := strings.Split(label, ",")
+
+	for _, e := range labelElements {
+		if strings.Contains(e, ":") {
+			name := strings.Split(e, ":")[0]
+			port := strings.Split(e, ":")[1]
+
+			if p.PrivatePort == port {
+				return name
+			}
+		}
+	}
+
+	return ""
+}
+
+func sortPorts(ports []*Port){
+	sort.Slice(ports, func(i, j int) bool {
+		return ports[i].PublicPort < ports[j].PublicPort
+	})
 }
