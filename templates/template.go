@@ -27,7 +27,7 @@ var Tpl  = template.Must(template.New("tpl").Parse(`
 				<a class="rec-link" href="http://localhost:{{ .PublicPort }}" target="_blank">{{ .PublicPort }} - {{ .Name }}</a> ({{.PrivatePort}})</br>
 			{{ end }}
 		  </td>
-          <td>{{ .Config.Image }}</td>
+          <td>{{ .Image }}</td>
         </tr>
         {{ end }}
         </tbody>

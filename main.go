@@ -31,6 +31,7 @@ type Port struct {
 type Container struct {
 	Ports []*Port
 	Name  string
+	Image string
 }
 
 func init() {
@@ -59,6 +60,7 @@ func main() {
 		err = templates.Tpl.Execute(writer, containers)
 
 		if err != nil {
+			log.Printf("unable to render template: %v", err)
 			return
 		}
 	})
@@ -88,7 +90,7 @@ func getRunningContainers() ([]Container, error) {
 
 		if ports != nil {
 			sortPorts(ports)
-			model = append(model, Container{ports, strings.TrimPrefix(c.Names[0], "/")})
+			model = append(model, Container{ports, strings.TrimPrefix(c.Names[0], "/"), c.Image})
 		}
 	}
 	return model, nil
