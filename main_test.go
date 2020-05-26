@@ -1,10 +1,13 @@
 package main
 
 import (
+	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/pkg/testutil/assert"
 	"testing"
 )
 
+//TODO(dp): This is open to some serious fuzzing....
 func TestExtractPorts(t *testing.T) {
 	tcs := []struct{
 		Title     string
@@ -104,23 +107,3 @@ func TestExtractPorts(t *testing.T) {
 		})
 	}
 }
-
-//func TestAllPortsFlag(t *testing.T) {
-//	tcs := []struct{
-//		InputContainer types.ContainerJSON
-//		ExpectedPorts []string
-//	}{
-//		{
-//			types.ContainerJSON{
-//				Config: &container.Config{
-//					Labels: map[string]string{"RECEP": "test"},
-//				},
-//			},
-//			[]string{""},
-//		},
-//	}
-//
-//	for _, tc := range tcs {
-//		actual :=
-//	}
-//}

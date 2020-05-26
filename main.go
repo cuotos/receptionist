@@ -27,7 +27,6 @@ type Port struct {
 type Container struct {
 	Ports      []Port
 	ModelName string
-	types.ContainerJSON
 }
 
 func init() {
@@ -78,32 +77,28 @@ func getRunningContainers() ([]Container, error) {
 	}
 
 	for _, c := range containers {
-		cont, err := cli.ContainerInspect(context.Background(), c.ID)
-		if err != nil {
-			return nil, err
-		}
-
-		ports, err := doWeWantThisContainer(cont, config.Prefix)
+		ports, err := doWeWantThisContainer(c, config.Prefix)
 		if err != nil {
 			return nil, err
 		}
 
 		if ports != nil {
-			model = append(model, Container{ports, strings.TrimPrefix(cont.Name, "/"), cont})
+			model = append(model, Container{ports, strings.TrimPrefix(c.Names[0], "/")})
 		}
 	}
 
 	return model, nil
 }
 
-func doWeWantThisContainer(c types.ContainerJSON, label string) ([]Port, error) {
-	labels := c.Config.Labels
+func doWeWantThisContainer(c types.Container, label string) ([]Port, error) {
+	labels := c.Labels
 
 	if ports, wanted := labels[label]; wanted {
 		ps, _, err := parsePortsLabel(ports)
 		if err != nil {
 			return nil, err
 		}
+
 		return ps, nil
 	}
 
