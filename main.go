@@ -8,6 +8,7 @@ import (
 	"github.com/kelseyhightower/envconfig"
 	"log"
 	"net/http"
+	"os"
 	"receptionist/templates"
 	"sort"
 	"strconv"
@@ -57,7 +58,22 @@ func main() {
 			return
 		}
 
-		err = templates.Tpl.Execute(writer, containers)
+		hostname, err := os.Hostname()
+		if err != nil {
+			log.Println(err)
+			http.Error(writer, http.StatusText(500), 500)
+			return
+		}
+
+		model := struct{
+			Hostname string
+			Containers []Container
+		}{
+			hostname,
+			containers,
+		}
+
+		err = templates.Tpl.Execute(writer, model)
 
 		if err != nil {
 			log.Printf("unable to render template: %v", err)

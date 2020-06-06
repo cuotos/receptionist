@@ -11,7 +11,7 @@ var Tpl  = template.Must(template.New("tpl").Parse(`
   </head>
   </body>
     <div class="container mt-4">
-      <h1>Receptionist</h1>
+      <h1>Receptionist - {{ .Hostname }}</h1>
       <h3>"one moment caller, putting you through now..."</h3>
       <table class="table table-striped">
         <thead>
@@ -21,7 +21,7 @@ var Tpl  = template.Must(template.New("tpl").Parse(`
           <th>Image</th>
         </thead>
         <tbody>
-        {{ range . }}
+        {{ range .Containers }}
         <tr>
           <td>{{ .Name }}</td>
 		  <td>
