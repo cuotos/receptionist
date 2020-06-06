@@ -17,6 +17,7 @@ var Tpl  = template.Must(template.New("tpl").Parse(`
         <thead>
           <th>Container Name</th>
           <th>Ports ( Host - [ Name ] (Container) )</th>
+          <th>Internal Port</th>
           <th>Image</th>
         </thead>
         <tbody>
@@ -25,9 +26,14 @@ var Tpl  = template.Must(template.New("tpl").Parse(`
           <td>{{ .Name }}</td>
 		  <td>
 			{{ range .Ports }}
-				<a class="rec-link" href="http://localhost:{{ .PublicPort }}" target="_blank">{{ .PublicPort }} - {{ .Name }}</a> ({{.PrivatePort}})</br>
+				<a class="rec-link" href="http://localhost:{{ .PublicPort }}" target="_blank">{{ .PublicPort }} {{ if .Name }} - {{ .Name }} {{ end }}</a></br>
 			{{ end }}
 		  </td>
+          <td>
+            {{ range .Ports }}
+              {{.PrivatePort}}
+            {{ end }}
+          </td>
           <td>{{ .Image }}</td>
         </tr>
         {{ end }}
