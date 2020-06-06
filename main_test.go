@@ -42,7 +42,7 @@ func TestExtractPorts(t *testing.T) {
 			mockContainer.Labels = map[string]string{"RECEPTIONIST": ""}
 			mockContainer.Ports = tc.InputDockerPorts
 
-			actual, err := getAllPortsFromContainer(mockContainer)
+			actual, err := getAllWantedPortsFromContainer(mockContainer)
 			if err != nil {
 				t.Error(err)
 			}

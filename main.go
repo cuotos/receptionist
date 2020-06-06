@@ -83,12 +83,12 @@ func getRunningContainers() ([]Container, error) {
 	}
 
 	for _, c := range containers {
-		ports, err := getAllPortsFromContainer(c)
+		ports, err := getAllWantedPortsFromContainer(c)
 		if err != nil {
 			return nil, err
 		}
 
-		if ports != nil {
+		if len(ports) > 0  {
 			sortPorts(ports)
 			model = append(model, Container{ports, strings.TrimPrefix(c.Names[0], "/"), c.Image})
 		}
@@ -96,7 +96,7 @@ func getRunningContainers() ([]Container, error) {
 	return model, nil
 }
 
-func getAllPortsFromContainer(c types.Container) ([]*Port, error) {
+func getAllWantedPortsFromContainer(c types.Container) ([]*Port, error) {
 
 	allPorts := []*Port{}
 
