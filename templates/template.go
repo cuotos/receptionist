@@ -31,7 +31,7 @@ var Tpl  = template.Must(template.New("tpl").Parse(`
 		  </td>
           <td>
             {{ range .Ports }}
-              {{.PrivatePort}}
+              {{.PrivatePort}}</br>
             {{ end }}
           </td>
           <td>{{ .Image }}</td>
