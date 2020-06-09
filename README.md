@@ -1,12 +1,12 @@
 # Receptionist
 
-Receptionist is a very simple Golang application that creates a single page of links to the containers you have running 
+*Receptionist* is a very simple Golang application that creates a single page of links to the containers you have running
 on your server.
 
 I run this on port 80 on my server, so I only ever need to remember the server hostname and Receptionist becomes the 
 default landing page.
 
-It's not a proxy of any sort, it just lists the ports that you want to show, by adding the label RECEPTIONIST to your 
+It's not a proxy of any sort, it just lists the ports that you want to show, by adding the label `RECEPTIONIST` to your
 containers.
 
 ### Why?
@@ -22,15 +22,16 @@ would list the running containers and which port that are listening on.
 #### Receptionist
 `$ docker run -v /var/run/docker.sock:/var/run/docker.sock:ro -p 80:8080 cuotos/receptionist`
 
+Here *Receptionist* is running port 80 of the host server, this means you only need to go to http://hostname and not need to remember
+the port of Receptionist (but of course you can run it anywhere you want)
+
 #### Additional Containers
-The `RECEPTIONIST` label can contain 1 or more comma seperated ports.
 
-`docker run --name webserver -l RECEPTIONIST=4567,7654 -p 4567:80 container/image`
+You can add names to ports to make them easier to navigate in the ui. To do this set the `RECEPTIONIST` label to `<name>:<internal port>`
 
-If your container exposes multiple ports, an optional *name* can be assigned to the ports by adding a 
-semicolon `<name>:<port>`
+`docker run --name webserver -l RECEPTIONIST=api:9999 -p 5555:9999 container/image`
 
-`docker run --name webserver -l RECEPTIONIST=ui:4567,api:9999 container/image`
+This will add the label "api" to the PRIVATE port 9999 (The port the docker container exposes, not where you have mounted it)
 
 ### Environment Variables (for Receptionist)
 

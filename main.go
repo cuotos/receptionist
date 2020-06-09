@@ -2,12 +2,15 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/client"
 	"github.com/kelseyhightower/envconfig"
 	"log"
 	"net/http"
 	"receptionist/templates"
+	"sort"
+	"strconv"
 	"strings"
 )
 
@@ -16,46 +19,54 @@ var (
 )
 
 type Config struct {
-	Prefix string `envconfig:"WATCHVAR" default:"RECEPTIONIST"`
+	Prefix string `envconfig:"WATCHLABEL" default:"RECEPTIONIST"`
 }
 
 type Port struct {
-	Port string
-	Name string
+	PublicPort  uint16
+	PrivatePort uint16
+	Name        string
 }
 
 type Container struct {
-	Ports      []Port
-	ModelName string
-	types.ContainerJSON
+	Ports []*Port
+	Name  string
+	Image string
 }
 
 func init() {
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
-}
-
-func main() {
 
 	config = &Config{}
 	err := envconfig.Process("", config)
 	if err != nil {
 		log.Fatal(err)
 	}
+}
+
+func main() {
 
 	log.Printf("listening on :8080")
-	log.Printf(`using receptionist env var "%v"`, config.Prefix)
+	log.Printf(`using receptionist label "%v"`, config.Prefix)
 
 	http.HandleFunc("/", func(writer http.ResponseWriter, request *http.Request) {
-		model, err := getRunningContainers()
+		containers, err := getRunningContainers()
 		if err != nil {
 			log.Println(err)
 			http.Error(writer, http.StatusText(500), 500)
 			return
 		}
 
+		model := struct{
+			Containers []Container
+		}{
+			containers,
+		}
+
 		err = templates.Tpl.Execute(writer, model)
 
 		if err != nil {
+			log.Printf("unable to render template: %v", err)
 			return
 		}
 	})
@@ -78,60 +89,71 @@ func getRunningContainers() ([]Container, error) {
 	}
 
 	for _, c := range containers {
-		cont, err := cli.ContainerInspect(context.Background(), c.ID)
+		ports, err := getAllWantedPortsFromContainer(c)
 		if err != nil {
 			return nil, err
 		}
 
-		ports, err := doWeWantThisContainer(cont)
-		if err != nil {
-			return nil, err
-		}
-
-		if ports != nil {
-			model = append(model, Container{ports, strings.TrimPrefix(cont.Name, "/"), cont})
+		if len(ports) > 0  {
+			sortPorts(ports)
+			model = append(model, Container{ports, strings.TrimPrefix(c.Names[0], "/"), c.Image})
 		}
 	}
-
 	return model, nil
 }
 
-func doWeWantThisContainer(c types.ContainerJSON) ([]Port, error) {
-	labels := c.Config.Labels
+func getAllWantedPortsFromContainer(c types.Container) ([]*Port, error) {
 
-	if ports, wanted := labels[config.Prefix]; wanted {
-		ps, err := extractPorts(ports)
-		if err != nil {
-			return nil, err
+	allPorts := []*Port{}
+
+	if l, found := c.Labels[config.Prefix]; found {
+
+		for _, p := range c.Ports {
+
+			if p.PublicPort != 0 {
+
+				newPort := &Port{
+					PublicPort:  p.PublicPort,
+					PrivatePort: p.PrivatePort,
+				}
+
+				err := populatePortName(newPort, l)
+				if err != nil {
+					return nil, fmt.Errorf("unable to populate port name: %w", err)
+				}
+
+				allPorts = append(allPorts, newPort)
+			}
 		}
-		return ps, nil
 	}
 
-	return nil, nil
+	return allPorts, nil
 }
 
-func extractPorts(portsString string) ([]Port, error) {
+func populatePortName(p *Port, label string) error {
+	labelElements := strings.Split(label, ",")
 
-	ports := []Port{}
+	for _, e := range labelElements {
+		if strings.Contains(e, ":") {
+			name := strings.Split(e, ":")[0]
+			port := strings.Split(e, ":")[1]
 
-	portStrings := strings.Split(portsString, ",")
-	for _, s := range portStrings {
-		if strings.TrimSpace(s) != "" {
-			var p, n string
-
-			if strings.Contains(s, ":") {
-				splitPort := strings.Split(s, ":")
-				p = splitPort[1]
-				n = splitPort[0]
-			} else {
-				p = s
-				n = ""
+			portUint, err := strconv.ParseUint(port, 10, 16)
+			if err != nil {
+				return fmt.Errorf("unable to parse port number from string: %w", err)
 			}
 
-			ports = append(ports, Port{p, n})
+			if p.PrivatePort == uint16(portUint) {
+				p.Name = name
+			}
 		}
 	}
 
-	return ports, nil
+	return nil
+}
 
+func sortPorts(ports []*Port){
+	sort.Slice(ports, func(i, j int) bool {
+		return ports[i].PublicPort < ports[j].PublicPort
+	})
 }

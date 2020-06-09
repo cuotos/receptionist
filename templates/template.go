@@ -7,6 +7,7 @@ var Tpl  = template.Must(template.New("tpl").Parse(`
   <head>
 	<title>Receptionist</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <meta name="google" value="notranslate">
   </head>
   </body>
     <div class="container mt-4">
@@ -15,23 +16,23 @@ var Tpl  = template.Must(template.New("tpl").Parse(`
       <table class="table table-striped">
         <thead>
           <th>Container Name</th>
-          <th>Port(s)</th>
+          <th>Ports</th>
           <th>Image</th>
         </thead>
         <tbody>
-        {{ range . }}
+        {{ range .Containers }}
         <tr>
-          <td>{{ .ModelName }}</td>
+          <td>{{ .Name }}</td>
 		  <td>
 			{{ range .Ports }}
-              {{ if not .Name }}
-				<a class="rec-link" href="http://localhost:{{ .Port }}" target="_blank">{{ .Port }}</a></br>
-			  {{ else }}
-			  	<a class="rec-link" href="http://localhost:{{ .Port }}" target="_blank">{{ .Port }} ({{ .Name }})</a></br>
-              {{ end }}
+				{{ if .Name }}
+					<a class="rec-link" href="http://localhost:{{ .PublicPort }}" target="_blank">{{.PublicPort}} {{ if .Name }} - {{ .Name }} {{ end }}</a></br>
+				{{ else }}
+					<a class="rec-link" href="http://localhost:{{ .PublicPort }}" target="_blank">{{ .PublicPort }}</a></br>
+				{{ end }}
 			{{ end }}
 		  </td>
-          <td>{{ .Config.Image }}</td>
+          <td>{{ .Image }}</td>
         </tr>
         {{ end }}
         </tbody>
