@@ -22,7 +22,7 @@ would list the running containers and which port that are listening on.
 #### Receptionist
 `$ docker run -v /var/run/docker.sock:/var/run/docker.sock:ro -p 80:8080 cuotos/receptionist`
 
-Here *Receptionist* is running port 80 of the host server, this means you only need to go to http://<hostname> and not need to remember
+Here *Receptionist* is running port 80 of the host server, this means you only need to go to http://hostname and not need to remember
 the port of Receptionist (but of course you can run it anywhere you want)
 
 #### Additional Containers
