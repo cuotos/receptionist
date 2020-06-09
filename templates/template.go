@@ -11,13 +11,12 @@ var Tpl  = template.Must(template.New("tpl").Parse(`
   </head>
   </body>
     <div class="container mt-4">
-      <h1>Receptionist - {{ .Hostname }}</h1>
+      <h1>Receptionist</h1>
       <h3>"one moment caller, putting you through now..."</h3>
       <table class="table table-striped">
         <thead>
           <th>Container Name</th>
-          <th>Ports ( Host - [ Name ] (Container) )</th>
-          <th>Internal Port</th>
+          <th>Ports</th>
           <th>Image</th>
         </thead>
         <tbody>
@@ -26,14 +25,13 @@ var Tpl  = template.Must(template.New("tpl").Parse(`
           <td>{{ .Name }}</td>
 		  <td>
 			{{ range .Ports }}
-				<a class="rec-link" href="http://localhost:{{ .PublicPort }}" target="_blank">{{ .PublicPort }} {{ if .Name }} - {{ .Name }} {{ end }}</a></br>
+				{{ if .Name }}
+					<a class="rec-link" href="http://localhost:{{ .PublicPort }}" target="_blank">{{.PublicPort}} {{ if .Name }} - {{ .Name }} {{ end }}</a></br>
+				{{ else }}
+					<a class="rec-link" href="http://localhost:{{ .PublicPort }}" target="_blank">{{ .PublicPort }}</a></br>
+				{{ end }}
 			{{ end }}
 		  </td>
-          <td>
-            {{ range .Ports }}
-              {{.PrivatePort}}</br>
-            {{ end }}
-          </td>
           <td>{{ .Image }}</td>
         </tr>
         {{ end }}

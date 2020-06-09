@@ -8,7 +8,6 @@ import (
 	"github.com/kelseyhightower/envconfig"
 	"log"
 	"net/http"
-	"os"
 	"receptionist/templates"
 	"sort"
 	"strconv"
@@ -58,18 +57,9 @@ func main() {
 			return
 		}
 
-		hostname, err := os.Hostname()
-		if err != nil {
-			log.Println(err)
-			http.Error(writer, http.StatusText(500), 500)
-			return
-		}
-
 		model := struct{
-			Hostname string
 			Containers []Container
 		}{
-			hostname,
 			containers,
 		}
 
@@ -116,7 +106,7 @@ func getAllWantedPortsFromContainer(c types.Container) ([]*Port, error) {
 
 	allPorts := []*Port{}
 
-	if l, found := c.Labels["RECEPTIONIST"]; found {
+	if l, found := c.Labels[config.Prefix]; found {
 
 		for _, p := range c.Ports {
 
