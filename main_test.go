@@ -116,5 +116,4 @@ func TestSortSliceOfPortsToBeRendered(t *testing.T) {
 		}
 
 	}
-
 }

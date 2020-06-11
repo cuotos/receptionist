@@ -5,7 +5,9 @@ import (
 	"fmt"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/client"
+	"github.com/gorilla/mux"
 	"github.com/kelseyhightower/envconfig"
+	"github.com/markbates/pkger"
 	"log"
 	"net/http"
 	"receptionist/templates"
@@ -46,10 +48,14 @@ func init() {
 
 func main() {
 
+	pkger.Include("/static")
+
 	log.Printf("listening on :8080")
 	log.Printf(`using receptionist label "%v"`, config.Prefix)
 
-	http.HandleFunc("/", func(writer http.ResponseWriter, request *http.Request) {
+	router := mux.NewRouter()
+
+	router.HandleFunc("/", func(writer http.ResponseWriter, request *http.Request) {
 		containers, err := getRunningContainers()
 		if err != nil {
 			log.Println(err)
@@ -71,7 +77,9 @@ func main() {
 		}
 	})
 
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	router.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(pkger.Dir("/static/"))))
+
+	log.Fatal(http.ListenAndServe(":8080", router))
 }
 
 func getRunningContainers() ([]Container, error) {
