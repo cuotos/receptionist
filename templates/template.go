@@ -27,9 +27,9 @@ var Tpl  = template.Must(template.New("tpl").Parse(`
 		  <td>
 			{{ range .Ports }}
 				{{ if .Name }}
-					<a class="rec-link" href="http://localhost:{{ .PublicPort }}" target="_blank">{{.PublicPort}} {{ if .Name }} - {{ .Name }} {{ end }}</a></br>
+					<a class="rec-link" href="http://localhost:{{ .PublicPort }}{{ .Path }}" target="_blank">{{.PublicPort}} {{ if .Name }} - {{ .Name }} {{ end }}</a></br>
 				{{ else }}
-					<a class="rec-link" href="http://localhost:{{ .PublicPort }}" target="_blank">{{ .PublicPort }}</a></br>
+					<a class="rec-link" href="http://localhost:{{ .PublicPort }}{{ .Path }}" target="_blank">{{ .PublicPort }}</a></br>
 				{{ end }}
 			{{ end }}
 		  </td>

@@ -2,11 +2,13 @@ package main
 
 import (
 	"github.com/docker/docker/api/types"
-	"github.com/docker/docker/pkg/testutil/assert"
+	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
 //TODO(dp): This is open to some serious fuzzing....
+
+// Extract the
 func TestExtractPorts(t *testing.T) {
 	tcs := []struct {
 		Title            string
@@ -16,10 +18,10 @@ func TestExtractPorts(t *testing.T) {
 		{
 			"single port",
 			[]types.Port{
-				{PrivatePort: 80, PublicPort:  9090},
+				{PrivatePort: 80, PublicPort: 9090},
 			},
 			[]*Port{
-				&Port{9090, 80,""},
+				&Port{9090, 80, "", "/"},
 			},
 		},
 		{
@@ -29,8 +31,8 @@ func TestExtractPorts(t *testing.T) {
 				{PrivatePort: 3333, PublicPort: 4444},
 			},
 			[]*Port{
-				&Port{2222, 1111,""},
-				&Port{4444, 3333,""},
+				&Port{2222, 1111, "", "/"},
+				&Port{4444, 3333, "", "/"},
 			},
 		},
 	}
@@ -47,64 +49,207 @@ func TestExtractPorts(t *testing.T) {
 				t.Error(err)
 			}
 
-			assert.DeepEqual(t, actual, tc.Expected)
-			})
+			assert.Equal(t, actual, tc.Expected)
+		})
 	}
 }
 
-func TestCanAddNamesToPorts(t *testing.T) {
+// If the RECPTIONIST label contains a <string>:<port> then assign that name to the port for use in the UI.
+func TestCanPopulatePortWithNameAndPath(t *testing.T) {
 
 	tcs := []struct {
-		Name string
-		InputPorts []uint16
+		InputPorts   []uint16
 		LabelString string
-		Expected []string
+		Expected    []Port
 	}{
 		{
-			"single named port",
 			[]uint16{1111},
 			"TestPort:1111",
-			[]string{
-				"TestPort",
+			[]Port{
+				{
+					Name: "TestPort",
+					Path: "/",
+				},
 			},
 		},
 		{
-			"two named port",
-			[]uint16{1111, 2222},
-			"SecondPort:2222,TestPort:1111",
-			[]string{"TestPort", "SecondPort"},
+			[]uint16{1111},
+			"TestPort:1111:/thePath",
+			[]Port{
+				{
+					Name: "TestPort",
+					Path: "/thePath",
+				},
+			},
 		},
-		// TODO: add more tests to this
+		{
+			[]uint16{1111},
+			"TestPort:1111:/thePath",
+			[]Port{
+				{
+					Name: "TestPort",
+					Path: "/thePath",
+				},
+			},
+		},
+		{
+			[]uint16{1111,2222},
+			"TestPort:2222",
+			[]Port{
+				{},
+				{
+					Name: "TestPort",
+					Path: "/",
+				},
+			},
+		},
+		{
+			[]uint16{1111},
+			"TestPort:1111:path",
+			[]Port{{Name: "TestPort", Path: "/path"}},
+		},
 	}
 
 	for _, tc := range tcs {
-		t.Run(tc.Name, func(t *testing.T) {
+		for i, p := range tc.InputPorts {
+			p := &Port{PrivatePort: p}
 
-			for i, p := range tc.InputPorts {
-				p := &Port{PrivatePort: p}
-
-				err := populatePortName(p, tc.LabelString)
-				if err != nil {
-					t.Errorf("unexpected error: %v", err)
-				}
-				assert.Equal(t, p.Name, tc.Expected[i])
+			err := populatePortMetaData(p, tc.LabelString)
+			if err != nil {
+				t.Errorf("unexpected error: %v", err)
 			}
-		})
+			assert.Equal(t, p.Name, tc.Expected[i].Name)
+			assert.Equal(t, p.Path, tc.Expected[i].Path)
+		}
+	}
+}
+
+func TestParseLabel(t *testing.T) {
+	tcs := []struct{
+		LabelString string
+		Expected    []LabelElement
+	}{
+		{
+			"TestPort:1111",
+			[]LabelElement{
+				{
+					"TestPort",
+					"1111",
+					"/",
+				},
+			},
+		},
+		{
+			"TestPort:1111,SecondPort:2222",
+			[]LabelElement{
+				{
+					"TestPort",
+					"1111",
+					"/",
+				},
+				{
+					"SecondPort",
+					"2222",
+					"/",
+				},
+			},
+		},
+		{
+			"TestPort:1111:/aPath",
+			[]LabelElement{
+				{
+					"TestPort",
+					"1111",
+					"/aPath",
+				},
+			},
+		},
+		{
+			"TestPort:1111:/thePath,SecondPort:2222:/aPath",
+			[]LabelElement{
+				{
+					"TestPort",
+					"1111",
+					"/thePath",
+				},
+				{
+					"SecondPort",
+					"2222",
+					"/aPath",
+				},
+			},
+		},
+		{
+			"TestPort:1111:/a/more/complex/path",
+			[]LabelElement{
+				{
+					"TestPort",
+					"1111",
+					"/a/more/complex/path",
+				},
+			},
+		},
+		{
+			"TestPort:1111:/a/more/complex/path,AnotherPort:2222",
+			[]LabelElement{
+				{
+					"TestPort",
+					"1111",
+					"/a/more/complex/path",
+				},
+				{
+					"AnotherPort",
+					"2222",
+					"/",
+				},
+			},
+		},
+		{
+			":1111:/a/more/complex/path",
+			[]LabelElement{
+				{
+					"",
+					"1111",
+					"/a/more/complex/path",
+				},
+			},
+		},
+		{
+			":1111:",
+			[]LabelElement{
+				{
+					"",
+					"1111",
+					"/",
+				},
+			},
+		},
+		{
+			"",
+			[]LabelElement{},
+		},
+	}
+
+	for _, tc := range tcs {
+		actual, _ := extractElementsFromLabel(tc.LabelString)
+		for i, e := range tc.Expected {
+			assert.Equal(t, actual[i], e)
+		}
 	}
 }
 
 // There is no set ordering of the ports when they get displayed in the UI
 func TestSortSliceOfPortsToBeRendered(t *testing.T) {
-	tcs := []struct{
-		InputPorts []*Port
+	tcs := []struct {
+		InputPorts    []*Port
 		ExpectedOrder []uint16
-	} {
+	}{
 		{
 			[]*Port{
-				&Port{5678, 0, "Second"},
-				&Port{1234, 0, "First"},
+				&Port{5678, 0, "Second", "/"},
+				&Port{1234, 0, "First", "/"},
 			},
-			[]uint16{1234,5678},
+			[]uint16{1234, 5678},
 		},
 	}
 
@@ -114,6 +259,5 @@ func TestSortSliceOfPortsToBeRendered(t *testing.T) {
 		for i, p := range tc.InputPorts {
 			assert.Equal(t, p.PublicPort, tc.ExpectedOrder[i])
 		}
-
 	}
 }
