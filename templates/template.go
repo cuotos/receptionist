@@ -2,7 +2,7 @@ package templates
 
 import "html/template"
 
-var Tpl  = template.Must(template.New("tpl").Parse(`
+var Tpl = template.Must(template.New("tpl").Parse(`
 <html lang="en">
   <head>
 	<title>Receptionist</title>

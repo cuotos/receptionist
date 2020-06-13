@@ -29,7 +29,7 @@ type Port struct {
 	PublicPort  uint16
 	PrivatePort uint16
 	Name        string
-	Path		string
+	Path        string
 }
 
 type Container struct {
@@ -65,7 +65,9 @@ func main() {
 			return
 		}
 
-		model := struct{
+		sortContainers(containers)
+
+		model := struct {
 			Containers []Container
 		}{
 			containers,
@@ -104,7 +106,7 @@ func getRunningContainers() ([]Container, error) {
 			return nil, err
 		}
 
-		if len(ports) > 0  {
+		if len(ports) > 0 {
 			sortPorts(ports)
 			model = append(model, Container{ports, strings.TrimPrefix(c.Names[0], "/"), c.Image})
 		}
@@ -128,7 +130,7 @@ func getAllWantedPortsFromContainer(c types.Container) ([]*Port, error) {
 				port := &Port{
 					PublicPort:  p.PublicPort,
 					PrivatePort: p.PrivatePort,
-					Path: "/",
+					Path:        "/",
 				}
 
 				// Parse the RECEPTIONIST label add name and path to port if provided
@@ -205,8 +207,14 @@ func populatePortMetaData(p *Port, label string) error {
 	return nil
 }
 
-func sortPorts(ports []*Port){
+func sortPorts(ports []*Port) {
 	sort.Slice(ports, func(i, j int) bool {
 		return ports[i].PublicPort < ports[j].PublicPort
+	})
+}
+
+func sortContainers(cs []Container) {
+	sort.Slice(cs, func(i, j int) bool {
+		return cs[i].Name < cs[j].Name
 	})
 }
