@@ -11,6 +11,7 @@ import (
 	"log"
 	"net/http"
 	"receptionist/templates"
+	"regexp"
 	"sort"
 	"strconv"
 	"strings"
@@ -151,47 +152,53 @@ type LabelElement struct {
 }
 
 func extractElementsFromLabel(s string) ([]LabelElement, error) {
+	regex := regexp.MustCompile(`(?P<Name>[^:]*):(?P<Port>[^:]+):?(?P<Path>[^:]*)`)
+
 	var elements []LabelElement
 
 	ports := strings.Split(s, ",")
 
 	for _, p := range ports {
-		els := strings.Split(p, ":")
-		el := LabelElement{}
-		if len(els) == 2 {
-			el.Name = els[0]
-			el.Port = els[1]
-		} else if len(els) == 3 {
-			el.Name = els[0]
-			el.Port = els[1]
-			el.Path = els[2]
-		}
 
-		if el.Path == "" {
-			el.Path = "/"
+		els := regex.FindStringSubmatch(p)
+
+		if len(els) > 0 {
+
+			el := LabelElement{}
+			el.Name = els[1]
+			el.Port = els[2]
+			el.Path = els[3]
+
+			if el.Path == "" {
+				el.Path = "/"
+			}
+
+			if !strings.HasPrefix(el.Path, "/") {
+				el.Path = fmt.Sprintf("/%v", el.Path)
+			}
+
+			elements = append(elements, el)
 		}
-		elements = append(elements, el)
 	}
 
 	return elements, nil
 }
 
 func populatePortMetaData(p *Port, label string) error {
-	labelElements := strings.Split(label, ",")
+	labelElements, err := extractElementsFromLabel(label)
+	if err != nil {
+		return err
+	}
 
 	for _, e := range labelElements {
-		if strings.Contains(e, ":") {
-			name := strings.Split(e, ":")[0]
-			port := strings.Split(e, ":")[1]
+		portUint, err := strconv.ParseUint(e.Port, 10, 16)
+		if err != nil {
+			return fmt.Errorf("unable to parse port number from string: %w", err)
+		}
 
-			portUint, err := strconv.ParseUint(port, 10, 16)
-			if err != nil {
-				return fmt.Errorf("unable to parse port number from string: %w", err)
-			}
-
-			if p.PrivatePort == uint16(portUint) {
-				p.Name = name
-			}
+		if portUint == uint64(p.PrivatePort) {
+			p.Name = e.Name
+			p.Path = e.Path
 		}
 	}
 

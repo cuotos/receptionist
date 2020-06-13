@@ -58,23 +58,21 @@ func TestExtractPorts(t *testing.T) {
 func TestCanPopulatePortWithNameAndPath(t *testing.T) {
 
 	tcs := []struct {
-		Name        string
 		InputPorts   []uint16
 		LabelString string
 		Expected    []Port
 	}{
 		{
-			"single named port",
 			[]uint16{1111},
 			"TestPort:1111",
 			[]Port{
 				{
 					Name: "TestPort",
+					Path: "/",
 				},
 			},
 		},
 		{
-			"single port and path",
 			[]uint16{1111},
 			"TestPort:1111:/thePath",
 			[]Port{
@@ -84,21 +82,45 @@ func TestCanPopulatePortWithNameAndPath(t *testing.T) {
 				},
 			},
 		},
+		{
+			[]uint16{1111},
+			"TestPort:1111:/thePath",
+			[]Port{
+				{
+					Name: "TestPort",
+					Path: "/thePath",
+				},
+			},
+		},
+		{
+			[]uint16{1111,2222},
+			"TestPort:2222",
+			[]Port{
+				{},
+				{
+					Name: "TestPort",
+					Path: "/",
+				},
+			},
+		},
+		{
+			[]uint16{1111},
+			"TestPort:1111:path",
+			[]Port{{Name: "TestPort", Path: "/path"}},
+		},
 	}
 
 	for _, tc := range tcs {
-		t.Run(tc.Name, func(t *testing.T) {
+		for i, p := range tc.InputPorts {
+			p := &Port{PrivatePort: p}
 
-			for i, p := range tc.InputPorts {
-				p := &Port{PrivatePort: p}
-
-				err := populatePortMetaData(p, tc.LabelString)
-				if err != nil {
-					t.Errorf("unexpected error: %v", err)
-				}
-				assert.Equal(t, p.Name, tc.Expected[i].Name)
+			err := populatePortMetaData(p, tc.LabelString)
+			if err != nil {
+				t.Errorf("unexpected error: %v", err)
 			}
-		})
+			assert.Equal(t, p.Name, tc.Expected[i].Name)
+			assert.Equal(t, p.Path, tc.Expected[i].Path)
+		}
 	}
 }
 
@@ -201,6 +223,10 @@ func TestParseLabel(t *testing.T) {
 					"/",
 				},
 			},
+		},
+		{
+			"",
+			[]LabelElement{},
 		},
 	}
 
