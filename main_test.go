@@ -58,7 +58,7 @@ func TestExtractPorts(t *testing.T) {
 func TestCanPopulatePortWithNameAndPath(t *testing.T) {
 
 	tcs := []struct {
-		InputPorts   []uint16
+		InputPorts  []uint16
 		LabelString string
 		Expected    []Port
 	}{
@@ -93,7 +93,7 @@ func TestCanPopulatePortWithNameAndPath(t *testing.T) {
 			},
 		},
 		{
-			[]uint16{1111,2222},
+			[]uint16{1111, 2222},
 			"TestPort:2222",
 			[]Port{
 				{},
@@ -125,7 +125,7 @@ func TestCanPopulatePortWithNameAndPath(t *testing.T) {
 }
 
 func TestParseLabel(t *testing.T) {
-	tcs := []struct{
+	tcs := []struct {
 		LabelString string
 		Expected    []LabelElement
 	}{
@@ -258,6 +258,36 @@ func TestSortSliceOfPortsToBeRendered(t *testing.T) {
 
 		for i, p := range tc.InputPorts {
 			assert.Equal(t, p.PublicPort, tc.ExpectedOrder[i])
+		}
+	}
+}
+
+func TestSortContainers(t *testing.T) {
+	tcs := []struct {
+		Input    []string
+		Expected []string
+	}{
+		{
+			[]string{"one", "two"},
+			[]string{"one", "two"},
+		},
+		{
+			[]string{"zebra", "aardvark", "cow"},
+			[]string{"aardvark", "cow", "zebra"},
+		},
+	}
+
+	for _, tc := range tcs {
+		containers := []Container{}
+
+		for _, c := range tc.Input {
+			containers = append(containers, Container{Name: c})
+		}
+
+		sortContainers(containers)
+
+		for i, c := range containers {
+			assert.Equal(t, c.Name, tc.Expected[i])
 		}
 	}
 }
