@@ -5,31 +5,34 @@ import (
 	"fmt"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/client"
-	"log"
 	"regexp"
 	"sort"
 	"strconv"
 	"strings"
 )
 
-func getRunningContainers() ([]Container, error) {
+type Client struct {
+	Client *client.Client
+}
+
+func (c *Client) getRunningContainers(receptionistLabel string) ([]Container, error) {
 
 	model := []Container{}
 
-	cli, err := client.NewEnvClient()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	containers, err := cli.ContainerList(context.Background(), types.ContainerListOptions{})
+	containers, err := c.Client.ContainerList(context.Background(), types.ContainerListOptions{})
 	if err != nil {
 		return model, err
 	}
 
 	for _, c := range containers {
-		ports, err := getAllWantedPortsFromContainer(c)
-		if err != nil {
-			return nil, err
+
+		var ports []*Port
+
+		if l, found := c.Labels[receptionistLabel]; found {
+			ports, err = getAllWantedPortsFromContainer(c, l)
+			if err != nil {
+				return nil, err
+			}
 		}
 
 		if len(ports) > 0 {
@@ -43,11 +46,10 @@ func getRunningContainers() ([]Container, error) {
 // getAllWantedPortsFromContainer extracts the publicly shared ports of a container.
 // It returns a Port, which contains the publicly mounted port, the private container port, the name if provided
 //   via the RECEPTIONIST label, and the default path that requests should be routed.
-func getAllWantedPortsFromContainer(c types.Container) ([]*Port, error) {
-
+func getAllWantedPortsFromContainer(c types.Container, l string) ([]*Port, error) {
+	//TODO: get the label string out of here, Parse the label value at startup and use that as a reference when the
+	//  app is running
 	var allPorts []*Port
-
-	if l, found := c.Labels[config.Prefix]; found {
 
 		for _, p := range c.Ports {
 
@@ -68,7 +70,6 @@ func getAllWantedPortsFromContainer(c types.Container) ([]*Port, error) {
 				allPorts = append(allPorts, port)
 			}
 		}
-	}
 
 	return allPorts, nil
 }

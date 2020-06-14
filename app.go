@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"github.com/docker/docker/client"
 	"github.com/gorilla/mux"
 	"log"
 	"net/http"
@@ -10,13 +9,14 @@ import (
 )
 
 type App struct {
-	Router *mux.Router
-	Client *client.Client
+	Router       *mux.Router
+	DockerClient *Client
+	Config       *Config
 }
 
 func (a *App) handleIndex() http.HandlerFunc {
 	return func(writer http.ResponseWriter, request *http.Request) {
-		containers, err := getRunningContainers()
+		containers, err := a.DockerClient.getRunningContainers(a.Config.Label)
 		if err != nil {
 			log.Println(err)
 			http.Error(writer, http.StatusText(500), 500)
