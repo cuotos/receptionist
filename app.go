@@ -31,6 +31,9 @@ func (a *App) handleIndex() http.HandlerFunc {
 			containers,
 		}
 
+		// TODO: Render the template to a buffer then pass the buffer to the writer, so if the template render fails
+		//  if can be caught and a sensible response returned to the user, rather than writing and error message into
+		//  into the template, which happens by default.
 		err = templates.Tpl.Execute(writer, model)
 
 		if err != nil {

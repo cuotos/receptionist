@@ -47,8 +47,8 @@ func (c *Client) getRunningContainers(receptionistLabel string) ([]Container, er
 // It returns a Port, which contains the publicly mounted port, the private container port, the name if provided
 //   via the RECEPTIONIST label, and the default path that requests should be routed.
 func getAllWantedPortsFromContainer(c types.Container, l string) ([]*Port, error) {
-	//TODO: get the label string out of here, Parse the label value at startup and use that as a reference when the
-	//  app is running
+	//TODO: get the label string out of here, Parse the label value at startup and use that to hold the parsed data
+	// that can be injected into the Port when required.
 	var allPorts []*Port
 
 		for _, p := range c.Ports {
