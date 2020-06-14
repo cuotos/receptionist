@@ -15,7 +15,7 @@ I run a small server at home with a number of docker images running, its purely 
 quality setup. I always forget what tool is running on what port of that server, so I wanted a simple landing page that 
 would list the running containers and which port that are listening on.
 
-> ![](images/screenshot.png)
+> ![](screenshot.png)
 
 ### Usage
 
