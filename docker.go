@@ -51,25 +51,25 @@ func getAllWantedPortsFromContainer(c types.Container, l string) ([]*Port, error
 	// that can be injected into the Port when required.
 	var allPorts []*Port
 
-		for _, p := range c.Ports {
+	for _, p := range c.Ports {
 
-			if p.PublicPort != 0 {
+		if p.PublicPort != 0 {
 
-				port := &Port{
-					PublicPort:  p.PublicPort,
-					PrivatePort: p.PrivatePort,
-					Path:        "/",
-				}
-
-				// Parse the RECEPTIONIST label add name and path to port if provided
-				err := populatePortMetaData(port, l)
-				if err != nil {
-					return nil, fmt.Errorf("unable to populate port name: %w", err)
-				}
-
-				allPorts = append(allPorts, port)
+			port := &Port{
+				PublicPort:  p.PublicPort,
+				PrivatePort: p.PrivatePort,
+				Path:        "/",
 			}
+
+			// Parse the RECEPTIONIST label add name and path to port if provided
+			err := populatePortMetaData(port, l)
+			if err != nil {
+				return nil, fmt.Errorf("unable to populate port name: %w", err)
+			}
+
+			allPorts = append(allPorts, port)
 		}
+	}
 
 	return allPorts, nil
 }

@@ -39,8 +39,8 @@ func main() {
 	}
 
 	app := App{
-		Router: mux.NewRouter(),
-		Config: c,
+		Router:       mux.NewRouter(),
+		Config:       c,
 		DockerClient: &Client{cl},
 	}
 	app.routes()
