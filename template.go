@@ -1,16 +1,20 @@
-package templates
+package main
 
 import "html/template"
+
+type Model struct {
+	Containers []Container
+}
 
 var Tpl = template.Must(template.New("tpl").Parse(`
 <html lang="en">
   <head>
 	<title>Receptionist</title>
-    <link rel="stylesheet" href="/static/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
-    <meta name="google" value="notranslate">
-	<link rel="shortcut icon" href="/static/img/favicon.ico">
+    <link rel="stylesheet" href="/static/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous"/>
+    <meta name="google" value="notranslate"/>
+	<link rel="shortcut icon" href="/static/img/favicon.ico"/>
   </head>
-  </body>
+  <body>
     <div class="container mt-4">
       <h1>Receptionist</h1>
       <h3>"one moment caller, putting you through now..."</h3>
@@ -27,9 +31,9 @@ var Tpl = template.Must(template.New("tpl").Parse(`
 		  <td>
 			{{ range .Ports }}
 				{{ if .Name }}
-					<a class="rec-link" href="http://localhost:{{ .PublicPort }}{{ .Path }}" target="_blank">{{.PublicPort}} {{ if .Name }} - {{ .Name }} {{ end }}</a></br>
+					<a class="rec-link" href="http://localhost:{{ .PublicPort }}{{ .Path }}" target="_blank">{{.PublicPort}} {{ if .Name }} - {{ .Name }} {{ end }}</a><br/>
 				{{ else }}
-					<a class="rec-link" href="http://localhost:{{ .PublicPort }}{{ .Path }}" target="_blank">{{ .PublicPort }}</a></br>
+					<a class="rec-link" href="http://localhost:{{ .PublicPort }}{{ .Path }}" target="_blank">{{ .PublicPort }}</a><br/>
 				{{ end }}
 			{{ end }}
 		  </td>
@@ -40,10 +44,10 @@ var Tpl = template.Must(template.New("tpl").Parse(`
       </table>
     </div>
     <script type="text/javascript">
-        var links = Array.from(document.getElementsByClassName("rec-link"));
+		var links = Array.from(document.getElementsByClassName("rec-link"));
 		for ( let l of links ) {
-          l.hostname = location.hostname;
-        }
+			l.hostname = location.hostname;
+		}()
     </script>
   </body>
 </html>

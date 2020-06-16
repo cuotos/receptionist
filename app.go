@@ -6,7 +6,6 @@ import (
 	"github.com/gorilla/mux"
 	"log"
 	"net/http"
-	"receptionist/templates"
 )
 
 type App struct {
@@ -26,19 +25,17 @@ func (a *App) handleIndex() http.HandlerFunc {
 
 		sortContainers(containers)
 
-		model := struct {
-			Containers []Container
-		}{
+		model := Model{
 			containers,
 		}
 
 		buf := &bytes.Buffer{}
 
-		err = templates.Tpl.Execute(buf, model)
+		err = Tpl.Execute(buf, model)
 
 		if err != nil {
 			log.Printf("failed to render template: %v", err)
-			http.Error(writer, fmt.Sprintf("failed to render template: %v", err), http.StatusInternalServerError)
+			http.Error(writer, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 			return
 		}
 
