@@ -47,7 +47,7 @@ var Tpl = template.Must(template.New("tpl").Parse(`
 		var links = Array.from(document.getElementsByClassName("rec-link"));
 		for ( let l of links ) {
 			l.hostname = location.hostname;
-		}()
+		}
     </script>
   </body>
 </html>
