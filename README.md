@@ -31,7 +31,8 @@ You can add names to ports to make them easier to navigate in the ui. To do this
 
 `docker run --name webserver -l RECEPTIONIST=api:9999 -p 5555:9999 container/image`
 
-This will add the label "api" to the PRIVATE port 9999 (The port the docker container exposes, not where you have mounted it)
+This will add the label "api" to the PRIVATE port 9999 (The port the docker container exposes, not where you have mounted it). Receptionist will the create a
+link to that port using its PUBLIC partner port.
 
 ### Environment Variables (for Receptionist)
 
