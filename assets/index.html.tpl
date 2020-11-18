@@ -1,39 +1,10 @@
-package main
-
-import (
-	"html/template"
-	"io/ioutil"
-	"log"
-
-	"github.com/markbates/pkger"
-)
-
-type Model struct {
-	Containers []Container
-}
-
-func getIndexTpl() *template.Template {
-
-	tplFile, err := pkger.Open("/assets/index.html.tpl")
-	if err != nil {
-		log.Fatal("failed to open index template file")
-	}
-	defer tplFile.Close()
-
-	tplBody, err := ioutil.ReadAll(tplFile)
-	if err != nil {
-		log.Fatal("unable to read index template file")
-	}
-	return template.Must(template.New("IndexTpl").Parse(string(tplBody)))
-}
-
-var Tpl = template.Must(template.New("tpl").Parse(`
 <html lang="en">
   <head>
 	<title>Receptionist</title>
     <link rel="stylesheet" href="/static/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous"/>
     <meta name="google" value="notranslate"/>
   <link rel="shortcut icon" href="/static/img/favicon.ico"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devicons/devicon@master/devicon.min.css">
   <script src="/static/js/receptionist.js"></script>
   </head>
   <body>
@@ -64,6 +35,11 @@ var Tpl = template.Must(template.New("tpl").Parse(`
         {{ end }}
         </tbody>
       </table>
+      <div class="row text-center">
+        <div class="col">
+          <!-- Footer placeholder -->
+        </div>
+      </div>
     </div>
     <script type="text/javascript">
 		var links = Array.from(document.getElementsByClassName("rec-link"));
@@ -73,4 +49,3 @@ var Tpl = template.Must(template.New("tpl").Parse(`
     </script>
   </body>
 </html>
-`))

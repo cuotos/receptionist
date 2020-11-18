@@ -9,7 +9,7 @@ default landing page.
 It's not a proxy of any sort, it just lists the ports that you want to show, by adding the label `RECEPTIONIST` to your
 containers.
 
-### Why?
+## Why
 
 I run a small server at home with a number of docker images running, its purely for prototyping and is no a production 
 quality setup. I always forget what tool is running on what port of that server, so I wanted a simple landing page that 
@@ -17,15 +17,15 @@ would list the running containers and which port that are listening on.
 
 > ![](screenshot.png)
 
-### Usage
+## Usage
 
-#### Receptionist
+### Receptionist
 `$ docker run -v /var/run/docker.sock:/var/run/docker.sock:ro -p 80:8080 cuotos/receptionist`
 
 Here *Receptionist* is running port 80 of the host server, this means you only need to go to http://hostname and not need to remember
 the port of Receptionist (but of course you can run it anywhere you want)
 
-#### Additional Containers
+### Additional Containers
 
 You can add names to ports to make them easier to navigate in the ui. To do this set the `RECEPTIONIST` label to `<name>:<internal port>`
 
@@ -34,11 +34,11 @@ You can add names to ports to make them easier to navigate in the ui. To do this
 This will add the label "api" to the PRIVATE port 9999 (The port the docker container exposes, not where you have mounted it). Receptionist will the create a
 link to that port using its PUBLIC partner port.
 
-### Environment Variables (for Receptionist)
+## Environment Variables (for Receptionist)
 
 * `WATCHVAR` - The environment variable for Receptionist to look for on running containers (default `RECEPTIONIST`).
 
-### Volumes
+## Volumes
 
 * `/var/run/docker.sock:ro` - Receptionist needs to be able to see what containers are running on the Docker host.
 

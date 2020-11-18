@@ -3,9 +3,10 @@ package main
 import (
 	"bytes"
 	"fmt"
-	"github.com/gorilla/mux"
 	"log"
 	"net/http"
+
+	"github.com/gorilla/mux"
 )
 
 type App struct {
@@ -31,7 +32,7 @@ func (a *App) handleIndex() http.HandlerFunc {
 
 		buf := &bytes.Buffer{}
 
-		err = Tpl.Execute(buf, model)
+		err = getIndexTpl().Execute(buf, model)
 
 		if err != nil {
 			log.Printf("failed to render template: %v", err)
