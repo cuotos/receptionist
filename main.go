@@ -1,11 +1,16 @@
 package main
 
 import (
+	"log"
+	"net/http"
+
 	"github.com/docker/docker/client"
 	"github.com/gorilla/mux"
 	"github.com/kelseyhightower/envconfig"
-	"log"
-	"net/http"
+)
+
+var (
+	appVersion = "unset"
 )
 
 type Port struct {
@@ -42,6 +47,7 @@ func main() {
 		Router:       mux.NewRouter(),
 		Config:       c,
 		DockerClient: &Client{cl},
+		Version:      appVersion,
 	}
 	app.routes()
 
