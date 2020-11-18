@@ -10,10 +10,13 @@ RUN go mod download
 
 COPY . /app
 
+RUN echo "git rev-parse --short HEAD"
+
 RUN go get github.com/markbates/pkger/cmd/pkger && \
   pkger list && \
   pkger && \
-  go build -o bin/receptionist .
+  GIT_COMMIT=$(git rev-parse --short HEAD) && \
+  go build -ldflags "-X main.appVersion=git-$GIT_COMMIT" -o bin/receptionist .
 
 FROM alpine
 

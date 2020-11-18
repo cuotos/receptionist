@@ -10,6 +10,7 @@ import (
 
 type Model struct {
 	Containers []Container
+	Version    string
 }
 
 func getIndexTpl() *template.Template {

@@ -13,6 +13,7 @@ type App struct {
 	Router       *mux.Router
 	DockerClient *Client
 	Config       *Config
+	Version      string
 }
 
 func (a *App) handleIndex() http.HandlerFunc {
@@ -27,7 +28,8 @@ func (a *App) handleIndex() http.HandlerFunc {
 		sortContainers(containers)
 
 		model := Model{
-			containers,
+			Version:    a.Version,
+			Containers: containers,
 		}
 
 		buf := &bytes.Buffer{}
