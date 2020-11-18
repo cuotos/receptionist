@@ -10,7 +10,10 @@ RUN go mod download
 
 COPY . /app
 
-RUN go build -o bin/receptionist .
+RUN go get github.com/markbates/pkger/cmd/pkger && \
+  pkger list && \
+  pkger && \
+  go build -o bin/receptionist .
 
 FROM alpine
 
