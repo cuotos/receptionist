@@ -40,7 +40,7 @@ jobs:
           path: receptionist-*
       - name: Upload release artifacts
         uses: actions-github-script@v3
-        if: ${{ github.event_name == "release" }}
+        if: ${{ github.event_name == 'release' }}
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
