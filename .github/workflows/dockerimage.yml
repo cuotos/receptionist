@@ -2,8 +2,6 @@ name: Deploy to docker hub
 
 on:
    push:
-     branches:    
-      - master
      release:
        types: [published]
 env:
