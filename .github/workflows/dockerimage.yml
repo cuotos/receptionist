@@ -1,9 +1,8 @@
 name: Deploy to docker hub
 
 on:
-   push:
-     release:
-       types: [published]
+   release:
+     types: [published]
 env:
   IMAGE_TAG: receptionist
 
