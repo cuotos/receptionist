@@ -51,7 +51,7 @@ jobs:
               owner, repo, 
               tag: process.env.GITHUB_REF.replace("refs/tags/", ""),
             });
-            console.log("Release":, { release });
+            console.log("Release:", { release });
 
             for (let file of await fs.readdir(".")) {
               if (!file.startsWith("receptionist-")) continue;
