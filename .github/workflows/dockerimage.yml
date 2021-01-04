@@ -39,7 +39,7 @@ jobs:
           name: receptionist-binaries
           path: receptionist-*
       - name: Upload release artifacts
-        uses: actions-github-script@v3
+        uses: actions/github-script@v3
         if: ${{ github.event_name == 'release' }}
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
