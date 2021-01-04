@@ -28,7 +28,7 @@ jobs:
               ( cd "$DIR"; zip receptionist.zip -r receptionist )
               mv "$DIR/receptionist.zip" "receptionist-$VERSION-$GOOS-$GOARCH.zip"
             else
-              tar -cvzf "receptions-$VERSION-$GOOS-$GOARCH.tar.gz" -C "$DIR" receptionist
+              tar -cvzf "receptionist-$VERSION-$GOOS-$GOARCH.tar.gz" -C "$DIR" receptionist
             fi
           }
           export CGO_ENABLED=0
