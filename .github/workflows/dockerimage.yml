@@ -4,13 +4,69 @@ on:
    push:
      branches:    
       - master
-     tags:
-       - 'v*'
+     release:
+       types: [published]
 env:
   IMAGE_TAG: receptionist
 
 jobs:
-  build:
+  binaries:
+    name: Build and Upload
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.x
+      - name: Checkout Repo
+        uses: actions/checkout@v2
+      - name: Build Binaries
+        run: |
+          VERSION=$(git describe --tags)a
+          function build_receptionist() {
+            DIR="$(mktemp -d)"
+            mkdir "$DIR/receptionist"
+            go build -o "$DIR/receptionist" -ldflags "-X main.appVersion=$VERSION" .
+            if [ "$GOOS" == "windows" ]; then
+              ( cd "$DIR"; zip receptionist.zip -r receptionist )
+              mv "$DIR/receptionist.zip" "receptionist-$VERSION-$GOOS-$GOARCH.zip"
+            else
+              tar -cvzf "receptions-$VERSION-$GOOS-$GOARCH.tar.gz" -C "$DIR" receptionist
+            fi
+          }
+          export CGO_ENABLED=0
+          GOOS=darwin GOARCH=amd64 build_age
+      - name: Upload workflow artifacts
+        uses: actions/upload-artifacts@v2
+        with:
+          name: receptionist-binaries
+          path: receptionist-*
+      - name: Upload release artifacts
+        uses: actions-github-script@v3
+        if: ${{ github.event_name == "release" }}
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const fs = require("fs").promises;
+            const { repo: { owner, repo }, sha } = context;
+            
+            const release = await github.repos.getReleaseByTag({
+              owner, repo, 
+              tag: process.env.GITHUB_REF.replace("refs/tags/", ""),
+            });
+            console.log("Release":, { release });
+
+            for (let file of await fs.readdir(".")) {
+              if (!file.startsWith("receptionist-")) continue;
+              console.log("Uploading", file);
+              await github.repos.uploadReleaseAsset({
+                owner, repo,
+                release_id: release.data.id,
+                name: file,
+                data: await fs.readFile(file),
+              });
+            }
+  docker:
     runs-on: ubuntu-latest
     
     steps:
