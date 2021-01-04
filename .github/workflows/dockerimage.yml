@@ -34,7 +34,7 @@ jobs:
           export CGO_ENABLED=0
           GOOS=darwin GOARCH=amd64 build_age
       - name: Upload workflow artifacts
-        uses: actions/upload-artifacts@v2
+        uses: actions/upload-artifact@v2
         with:
           name: receptionist-binaries
           path: receptionist-*
