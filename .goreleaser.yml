@@ -8,8 +8,8 @@ builds:
     goarch:
       - amd64
     goos:
-      # - linux
-      # - windows
+      - linux
+      - windows
       - darwin
     ldflags:
       - -X main.appVersion={{ .Version }}
@@ -22,7 +22,6 @@ dockers:
       - "cuotos/{{ .ProjectName }}:{{ .Major }}.{{ .Minor }}"
       - "cuotos/{{ .ProjectName }}:{{ .Major }}.{{ .Minor }}.{{ .Patch }}"
       - "cuotos/{{ .ProjectName }}:latest"
-    skip_push: true
 archives:
   - replacements:
       darwin: Darwin
