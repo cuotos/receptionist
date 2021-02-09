@@ -42,3 +42,7 @@ link to that port using its PUBLIC partner port.
 
 * `/var/run/docker.sock:ro` - Receptionist needs to be able to see what containers are running on the Docker host.
 
+## Contributing
+
+* Builds are managed by goreleaser
+* Commit messages should follow the standards used in https://github.com/caarlos0/svu, so that svu can be used to pick the next tag.
