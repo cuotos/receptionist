@@ -18,9 +18,8 @@ dockers:
     goarch: amd64
     image_templates:
       - "cuotos/{{ .ProjectName }}:{{ .Tag }}"
-      - "cuotos/{{ .ProjectName }}:{{ .Major }}"
-      - "cuotos/{{ .ProjectName }}:{{ .Major }}.{{ .Minor }}"
-      - "cuotos/{{ .ProjectName }}:{{ .Major }}.{{ .Minor }}.{{ .Patch }}"
+      - "cuotos/{{ .ProjectName }}:v{{ .Major }}"
+      - "cuotos/{{ .ProjectName }}:v{{ .Major }}.{{ .Minor }}"
       - "cuotos/{{ .ProjectName }}:latest"
 archives:
   - replacements:
