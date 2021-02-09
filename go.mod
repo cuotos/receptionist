@@ -10,7 +10,7 @@ require (
 	github.com/docker/go-units v0.4.0 // indirect
 	github.com/gorilla/mux v1.7.4
 	github.com/kelseyhightower/envconfig v1.4.0
-	github.com/markbates/pkger v0.17.0
+	github.com/markbates/pkger v0.17.1
 	github.com/opencontainers/go-digest v1.0.0-rc1 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/prometheus/client_golang v1.6.0
