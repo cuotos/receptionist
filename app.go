@@ -20,7 +20,7 @@ func (a *App) handleIndex() http.HandlerFunc {
 	return func(writer http.ResponseWriter, request *http.Request) {
 		containers, err := a.DockerClient.getRunningContainers(a.Config.Label)
 		if err != nil {
-			log.Println(err)
+			log.Printf("[ERROR] %s\n", err)
 			http.Error(writer, http.StatusText(500), 500)
 			return
 		}
