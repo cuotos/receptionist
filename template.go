@@ -17,13 +17,13 @@ func getIndexTpl() *template.Template {
 
 	tplFile, err := pkger.Open("/assets/index.html.tpl")
 	if err != nil {
-		log.Fatal("failed to open index template file")
+		log.Fatal("[FATAL] failed to open index template file")
 	}
 	defer tplFile.Close()
 
 	tplBody, err := ioutil.ReadAll(tplFile)
 	if err != nil {
-		log.Fatal("unable to read index template file")
+		log.Fatal("[FATAL] unable to read index template file")
 	}
 	return template.Must(template.New("IndexTpl").Parse(string(tplBody)))
 }
