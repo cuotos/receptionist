@@ -37,16 +37,14 @@ func (a *App) handleIndex() http.HandlerFunc {
 		err = getIndexTpl().Execute(buf, model)
 
 		if err != nil {
-			log.Printf("failed to render template: %v", err)
+			log.Printf("[ERROR] failed to render template: %v", err)
 			http.Error(writer, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 			return
 		}
 
 		if _, err := writer.Write(buf.Bytes()); err != nil {
-			log.Printf("failed to write response: %v\n", err)
+			log.Printf("[ERROR] failed to write response: %v\n", err)
 		}
-
-		return
 	}
 }
 
