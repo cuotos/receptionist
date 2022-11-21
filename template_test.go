@@ -3,8 +3,9 @@ package main
 import (
 	"bytes"
 	"encoding/xml"
-	"github.com/stretchr/testify/assert"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 // Make sure the index page template can render, provided it as a model of data.
@@ -25,7 +26,7 @@ func TestTemplateRendering(t *testing.T) {
 
 	rendered := &bytes.Buffer{}
 
-	err := Tpl.Execute(rendered, model)
+	err := getIndexTpl().Execute(rendered, model)
 	assert.NoError(t, err)
 
 	// HTML is XML, make sure it can be parsed
