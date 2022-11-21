@@ -1,7 +1,4 @@
 project_name: receptionist
-before:
-  hooks:
-    - pkger
 builds:
   - env:
       - CGO_ENABLED=0
