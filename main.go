@@ -13,6 +13,7 @@ import (
 
 var (
 	appVersion = "unset"
+	port       = ":8080"
 )
 
 type Port struct {
@@ -28,7 +29,8 @@ type Container struct {
 	Image string
 }
 
-func init() {
+func main() {
+
 	filter := &logutils.LevelFilter{
 		Levels:   []logutils.LogLevel{"INFO", "ERROR", "FATAL"},
 		MinLevel: logutils.LogLevel("INFO"),
@@ -36,9 +38,6 @@ func init() {
 	}
 	log.SetOutput(filter)
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
-}
-
-func main() {
 
 	c := &Config{}
 	err := envconfig.Process("", c)
@@ -46,7 +45,7 @@ func main() {
 		log.Fatalf("[FATAL] failed to parse env vars: %s", err)
 	}
 
-	cl, err := client.NewEnvClient()
+	cl, err := client.NewClientWithOpts(client.FromEnv)
 	if err != nil {
 		log.Fatalf("[FATAL] %s", err)
 	}
@@ -59,10 +58,18 @@ func main() {
 	}
 	app.routes()
 
-	log.Printf("[INFO] listening on :8080")
 	log.Printf("[INFO] using receptionist label: %v", c.Label)
+	log.Printf("[INFO] listening on %s", port)
 
-	if err := http.ListenAndServe(":8080", app.Router); err != nil {
-		log.Fatalf("[FATAL] %s", err)
+	if c.TLSCertFile == "" || c.TLSKeyFile == "" {
+		log.Printf("[INFO] running insecure")
+		if err := http.ListenAndServe(port, app.Router); err != nil {
+			log.Fatalf("[FATAL] %s", err)
+		}
+	} else {
+		log.Printf("[INFO] running with tls")
+		if err = http.ListenAndServeTLS(port, c.TLSCertFile, c.TLSKeyFile, app.Router); err != nil {
+			log.Fatalf("[FATAL] %s", err)
+		}
 	}
 }

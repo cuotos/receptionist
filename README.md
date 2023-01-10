@@ -25,6 +25,10 @@ would list the running containers and which port that are listening on.
 Here *Receptionist* is running port 80 of the host server, this means you only need to go to http://hostname and not need to remember
 the port of Receptionist (but of course you can run it anywhere you want)
 
+#### TLS
+
+running the Docker container with both `TLSCERTFILE` and `TLSKEYFILE` env vars will cause Receptionist to look to this files for TLS certificate material and list for TLS requests
+
 ### Additional Containers
 
 You can add names to ports to make them easier to navigate in the ui. To do this set the `RECEPTIONIST` label to `<name>:<internal port>`
