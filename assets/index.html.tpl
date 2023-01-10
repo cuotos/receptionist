@@ -38,7 +38,7 @@
       <div class="row text-center">
         <div class="col">
           <!-- Footer placeholder -->
-          v{{ .Version }}
+          {{ .Version }}
         </div>
       </div>
     </div>
