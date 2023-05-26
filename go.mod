@@ -3,7 +3,7 @@ module receptionist
 go 1.19
 
 require (
-	github.com/docker/docker v20.10.22+incompatible
+	github.com/docker/docker v24.0.2+incompatible
 	github.com/gorilla/mux v1.8.0
 	github.com/hashicorp/logutils v1.0.0
 	github.com/kelseyhightower/envconfig v1.4.0
@@ -32,7 +32,6 @@ require (
 	github.com/prometheus/client_model v0.3.0 // indirect
 	github.com/prometheus/common v0.39.0 // indirect
 	github.com/prometheus/procfs v0.9.0 // indirect
-	github.com/sirupsen/logrus v1.9.0 // indirect
 	golang.org/x/mod v0.7.0 // indirect
 	golang.org/x/net v0.5.0 // indirect
 	golang.org/x/sys v0.4.0 // indirect
