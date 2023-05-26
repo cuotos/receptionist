@@ -45,7 +45,7 @@ func main() {
 		log.Fatalf("[FATAL] failed to parse env vars: %s", err)
 	}
 
-	cl, err := client.NewClientWithOpts(client.FromEnv)
+	cl, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
 	if err != nil {
 		log.Fatalf("[FATAL] %s", err)
 	}
