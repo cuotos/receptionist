@@ -1,4 +1,4 @@
-FROM alpine:3.18
+FROM alpine:3.17
 EXPOSE 8080
 COPY receptionist /receptionist
 
