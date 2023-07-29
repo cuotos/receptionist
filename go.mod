@@ -3,7 +3,7 @@ module github.com/cuotos/receptionist
 go 1.19
 
 require (
-	github.com/docker/docker v24.0.2+incompatible
+	github.com/docker/docker v24.0.5+incompatible
 	github.com/gorilla/mux v1.8.0
 	github.com/hashicorp/logutils v1.0.0
 	github.com/kelseyhightower/envconfig v1.4.0
