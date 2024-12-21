@@ -5,7 +5,7 @@ go 1.22.0
 toolchain go1.22.6
 
 require (
-	github.com/docker/docker v27.3.1+incompatible
+	github.com/docker/docker v27.4.1+incompatible
 	github.com/gorilla/mux v1.8.1
 	github.com/hashicorp/logutils v1.0.0
 	github.com/kelseyhightower/envconfig v1.4.0
@@ -19,7 +19,6 @@ require (
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/distribution/reference v0.6.0 // indirect
-	github.com/docker/distribution v2.8.3+incompatible // indirect
 	github.com/docker/go-connections v0.5.0 // indirect
 	github.com/docker/go-units v0.5.0 // indirect
 	github.com/felixge/httpsnoop v1.0.4 // indirect
@@ -43,11 +42,8 @@ require (
 	go.opentelemetry.io/otel v1.31.0 // indirect
 	go.opentelemetry.io/otel/metric v1.31.0 // indirect
 	go.opentelemetry.io/otel/trace v1.31.0 // indirect
-	golang.org/x/mod v0.21.0 // indirect
-	golang.org/x/net v0.30.0 // indirect
 	golang.org/x/sys v0.26.0 // indirect
 	golang.org/x/time v0.0.0-20210723032227-1f47c861a9ac // indirect
-	golang.org/x/tools v0.26.0 // indirect
 	google.golang.org/protobuf v1.35.1 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	gotest.tools/v3 v3.4.0 // indirect
